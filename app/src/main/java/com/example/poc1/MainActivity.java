@@ -1,21 +1,19 @@
 package com.example.poc1;
 
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.Toast;
-
-import com.example.poc1.fragments.LoginFragment;
 import com.example.poc1.fragments.DisplayPostFragment;
+import com.example.poc1.fragments.LoginFragment;
 import com.example.poc1.fragments.PostDetailsFragment;
 import com.example.poc1.models.Post;
 import com.example.poc1.models.User;
@@ -54,13 +52,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         });
 
         showLoginFragment();
-
-        findViewById(R.id.click).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLoginSuccess(null);
-            }
-        });
     }
 
     private void showLoginFragment() {
@@ -79,36 +70,20 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
     public void onLoginSuccess(User user) {
         Log.d(TAG, "onLoginSuccess() called with: user = [" + user + "]");
 
-        loginDialogFragment = getSupportFragmentManager().findFragmentByTag("login");
-        if(loginDialogFragment!=null){
-            getSupportFragmentManager().beginTransaction().remove(loginDialogFragment).commit();
-        }
+//        frmContainer.removeAllViews();
+        getSupportActionBar().show();
+        getSupportActionBar().setTitle(user.getName());
 
-//
-////        frmContainer.removeAllViews();
-//        getSupportActionBar().show();
-//        getSupportActionBar().setTitle(user.getName());
-//
-//        DisplayPostFragment displayPostFragment = new DisplayPostFragment();
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable("user",user);
-//        displayPostFragment.setArguments(bundle);
-//        displayPostFragment.setOnItemClickListener(this);
-//
-//
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-////        FragmentTransaction trnc = fragmentManager.beginTransaction();
-////        LoginFragment loginDialogFragment = (LoginFragment) fragmentManager.findFragmentByTag("login");
-////        if (loginDialogFragment != null) {
-////            trnc.remove(loginDialogFragment);
-////        }
-////        trnc.commit();
-//
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//        transaction.replace(R.id.frmContainer,displayPostFragment,"DisplayPost");
-//        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
+        DisplayPostFragment displayPostFragment = new DisplayPostFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("user", user);
+        displayPostFragment.setArguments(bundle);
+        displayPostFragment.setOnItemClickListener(this);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.frmContainer, displayPostFragment, "DisplayPost");
+        transaction.commit();
     }
 
     @Override

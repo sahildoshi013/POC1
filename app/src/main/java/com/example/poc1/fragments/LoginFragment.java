@@ -15,7 +15,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.poc1.R;
+import com.example.poc1.api.WebAPI;
 import com.example.poc1.models.User;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,34 +48,32 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void performLogin(final String emailID) {
-        loginCallback.onLoginSuccess(new User());
+        WebAPI.getClient().getUsers().enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                User loginUser = null;
+                if (response.isSuccessful()) {
+                    List<User> users = response.body();
+                    for (User user : users) {
+                        if (user.getEmail().toLowerCase().equals(emailID.toLowerCase())) {
+                            loginUser = user;
+                        }
+                    }
+                }
+                if (loginUser != null) {
+                    loginCallback.onLoginSuccess(loginUser);
+                } else {
+                    loginCallback.onLoginFail(emailID);
+                }
 
-//        WebAPI.getClient().getUsers().enqueue(new Callback<List<User>>() {
-//            @Override
-//            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-//                User loginUser = null;
-//                if (response.isSuccessful()){
-//                    List<User> users = response.body();
-//                    for (User user : users){
-//                        if (user.getEmail().toLowerCase().equals(emailID.toLowerCase())){
-//                            loginUser = user;
-//                        }
-//                    }
-//                }
-//                if (loginUser!=null){
-//                    loginCallback.onLoginSuccess(loginUser);
-//                }else{
-//                    loginCallback.onLoginFail(emailID);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<User>> call, Throwable t) {
-//                Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-//                loginCallback.onLoginFail(emailID);
-//            }
-//        });
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+                loginCallback.onLoginFail(emailID);
+            }
+        });
     }
 
     public interface LoginCallback{
