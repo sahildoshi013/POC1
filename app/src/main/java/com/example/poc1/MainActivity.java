@@ -2,21 +2,23 @@ package com.example.poc1;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.poc1.fragments.DisplayPostFragment;
 import com.example.poc1.fragments.LoginFragment;
 import com.example.poc1.fragments.PostDetailsFragment;
 import com.example.poc1.models.Post;
 import com.example.poc1.models.User;
+import com.example.poc1.utilities.FragmentFactory;
+import com.example.poc1.utilities.SharedPreferencesUtilities;
 
 import java.util.List;
 
@@ -37,42 +39,36 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
 
         frmContainer = findViewById(R.id.frmContainer);
 
-        frmContainer.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
-            @Override
-            public void onChildViewAdded(View view, View view1) {
-                Log.d(TAG, "onChildViewAdded() called with: view = [" + view + "], view1 = [" + view1 + "]");
-                Toast.makeText(MainActivity.this, "Childs : " + frmContainer.getChildCount(), Toast.LENGTH_SHORT).show();
-            }
+        checkLoginAndShowFragment();
+    }
 
-            @Override
-            public void onChildViewRemoved(View view, View view1) {
-                Log.d(TAG, "onChildViewRemoved() called with: view = [" + view + "], view1 = [" + view1 + "]");
-                Toast.makeText(MainActivity.this, "Childs : " + frmContainer.getChildCount(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        showLoginFragment();
+    private void checkLoginAndShowFragment() {
+        if (SharedPreferencesUtilities.getInstance(this).isUserLogin()) {
+            User user = SharedPreferencesUtilities.getInstance(this).loggedInUser();
+            showDisplayPostFragment(user);
+        } else {
+            showLoginFragment();
+        }
     }
 
     private void showLoginFragment() {
-        addFragment();
-    }
-
-    private void addFragment() {
         loginDialogFragment = new LoginFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.frmContainer,loginDialogFragment,"login");
-        transaction.commit();
+        FragmentFactory.loadFragment(this, R.id.frmContainer, loginDialogFragment, false);
     }
 
     @Override
     public void onLoginSuccess(User user) {
         Log.d(TAG, "onLoginSuccess() called with: user = [" + user + "]");
+        SharedPreferencesUtilities.getInstance(this).saveUserData(user);
+        showDisplayPostFragment(user);
+    }
 
-//        frmContainer.removeAllViews();
-        getSupportActionBar().show();
-        getSupportActionBar().setTitle(user.getName());
+    private void showDisplayPostFragment(User user) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+            actionBar.setTitle(user.getName());
+        }
 
         DisplayPostFragment displayPostFragment = new DisplayPostFragment();
         Bundle bundle = new Bundle();
@@ -80,10 +76,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         displayPostFragment.setArguments(bundle);
         displayPostFragment.setOnItemClickListener(this);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.frmContainer, displayPostFragment, "DisplayPost");
-        transaction.commit();
+        FragmentFactory.loadFragment(this, R.id.frmContainer, displayPostFragment, false);
     }
 
     @Override
@@ -109,7 +102,28 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         Toast.makeText(this, post.getTitle(), Toast.LENGTH_SHORT).show();
         PostDetailsFragment postDetailsFragment = new PostDetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("post",post);
+        bundle.putString("postTitle", post.getTitle());
+        bundle.putString("postBody", post.getBody());
+        bundle.putInt("postID", post.getId());
+        postDetailsFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.frmContainer, postDetailsFragment, "DisplayPost").addToBackStack("DisplayPost").commit();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menus, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.btnLogout) {
+            SharedPreferencesUtilities.getInstance(this).logoutUser();
+            int count = getSupportFragmentManager().getBackStackEntryCount();
+            Log.d(TAG, "onOptionsItemSelected: " + count);
+            getSupportFragmentManager().popBackStack();
+            showLoginFragment();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

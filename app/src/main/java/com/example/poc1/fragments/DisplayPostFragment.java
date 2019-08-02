@@ -3,15 +3,17 @@ package com.example.poc1.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.poc1.R;
 import com.example.poc1.adapter.MyPostAdapter;
@@ -34,6 +36,10 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private static final String TAG = "DisplayPostFragment";
     private PostDisplayCallbacks postDisplayCallbacks;
     private OnPostItemClickCallback itemClickListenerCallback;
+    private int scrollState;
+    private GridLayoutManager gridLayoutManager;
+    private StaggeredGridLayoutManager staggerGridLayoutManager;
+    private Call<List<Post>> networkCall;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -79,12 +85,17 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     @Override
     public void onDetach() {
         super.onDetach();
+        if (networkCall != null) {
+            networkCall.cancel();
+        }
         postDisplayCallbacks = null;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setRetainInstance(true);
 
         if(getArguments()==null){
             throw new IllegalStateException("Invalid invocation put user in arguments");
@@ -96,8 +107,13 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
         recyclerView = view.findViewById(R.id.rvPost);
 
-        layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
+        layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
+
+        gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+
+        staggerGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+
+        recyclerView.setLayoutManager(staggerGridLayoutManager);
 
         posts = new LinkedList<>();
 
@@ -106,17 +122,29 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
         recyclerView.setAdapter(myPostAdapter);
 
+        if (savedInstanceState != null) {
+            scrollState = savedInstanceState.getInt(getString(R.string.scroll_state), 0);
+
+        }
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState() called with: outState = [" + outState + "]");
+        outState.putInt(getString(R.string.scroll_state), recyclerView.getScrollState());
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        getLatestPosts(user.getId());
+        getLatestPosts(1);
     }
 
     private void getLatestPosts(Integer userID) {
-        WebAPI.getClient().getPostOfUser(userID).enqueue(new Callback<List<Post>>() {
+        networkCall = WebAPI.getClient().getPostOfUser(userID);
+        networkCall.enqueue(new Callback<List<Post>>() {
             @Override
             public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
                 List<Post> result = null;

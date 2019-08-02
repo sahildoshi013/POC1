@@ -15,4 +15,9 @@
     <string name="sign_up">Sign up</string>
     <string name="forget_password">Forget Password.?</string>
     <string name="hello_there">Hello!!!</string>
+    <string name="scroll_state">scrollState</string>
+    <string name="sharedPreferencesForUser">com.example.poc1.data</string>
+    <string name="isUserLogin">isUserLogin</string>
+    <string name="userField">user</string>
+    <string name="logout">Logout</string>
 </resources>

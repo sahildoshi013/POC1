@@ -18,7 +18,7 @@ public interface WebAPIInterface {
     @GET("users/{user_id}/posts")
     Call<List<Post>> getPostOfUser(@Path("user_id") Integer userId);
 
-    @GET("posts/{post_id/comments")
+    @GET("posts/{post_id}/comments")
     Call<List<Comment>> getCommentsOfPost(@Path("post_id") Integer postId);
 
 }
