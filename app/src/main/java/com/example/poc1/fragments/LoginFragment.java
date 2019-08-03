@@ -67,10 +67,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         }
                     }
                 }
-                if (loginUser != null) {
-                    loginCallback.onLoginSuccess(loginUser);
-                } else {
-                    loginCallback.onLoginFail(emailID);
+                if (loginCallback != null) {
+                    if (loginUser != null) {
+                        loginCallback.onLoginSuccess(loginUser);
+                    } else {
+                        loginCallback.onLoginFail(emailID);
+                    }
                 }
                 btnLogin.setClickable(true);
                 progress_horizontal.setVisibility(View.INVISIBLE);
@@ -79,7 +81,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                loginCallback.onLoginFail(emailID);
+                if (loginCallback != null) {
+                    loginCallback.onLoginFail(emailID);
+                }
                 btnLogin.setClickable(true);
                 progress_horizontal.setVisibility(View.INVISIBLE);
             }

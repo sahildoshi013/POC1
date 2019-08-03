@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -40,6 +41,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private GridLayoutManager gridLayoutManager;
     private StaggeredGridLayoutManager staggerGridLayoutManager;
     private Call<List<Post>> networkCall;
+    private ProgressBar progressBarPost;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -106,6 +108,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
         View view = inflater.inflate(R.layout.fragment_post, container, false);
 
         recyclerView = view.findViewById(R.id.rvPost);
+        progressBarPost = view.findViewById(R.id.progressBarPost);
 
         layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
 
@@ -151,20 +154,38 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
                 if (response.isSuccessful()){
                     result = response.body();
                 }
-                if(result!=null){
+                if (result != null) {
                     posts.addAll(result);
                     myPostAdapter.notifyDataSetChanged();
-                    postDisplayCallbacks.onDisplayPost(posts);
-                }else{
-                    postDisplayCallbacks.onDisplayPostFail();
                 }
+                if (postDisplayCallbacks != null) {
+                    if (result != null) {
+                        postDisplayCallbacks.onDisplayPost(posts);
+                    } else {
+                        postDisplayCallbacks.onDisplayPostFail();
+                    }
+                }
+                toggleProgressBar();
             }
 
             @Override
             public void onFailure(Call<List<Post>> call, Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                postDisplayCallbacks.onDisplayPostFail();
+                if (postDisplayCallbacks != null) {
+                    postDisplayCallbacks.onDisplayPostFail();
+                }
+                toggleProgressBar();
             }
         });
+    }
+
+    private void toggleProgressBar() {
+        if (progressBarPost.getVisibility() == View.GONE) {
+            progressBarPost.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            progressBarPost.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

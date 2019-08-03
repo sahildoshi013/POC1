@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -39,6 +40,7 @@ public class PostDetailsFragment extends Fragment {
     private List<Comment> comments;
     private MyCommentAdapter myCommentAdapter;
     private Call<List<Comment>> networkCall;
+    private ProgressBar progressBarComment;
 
     public PostDetailsFragment() {
         // Required empty public constructor
@@ -61,6 +63,7 @@ public class PostDetailsFragment extends Fragment {
         }
 
         rvComment = view.findViewById(R.id.rvPostComments);
+        progressBarComment = view.findViewById(R.id.progressBarComment);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvComment.setLayoutManager(linearLayoutManager);
@@ -86,13 +89,25 @@ public class PostDetailsFragment extends Fragment {
                         myCommentAdapter.notifyDataSetChanged();
                     }
                 }
+                toggleProgressBar();
             }
 
             @Override
             public void onFailure(Call<List<Comment>> call, Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
+                toggleProgressBar();
             }
         });
+    }
+
+    private void toggleProgressBar() {
+        if (progressBarComment.getVisibility() == View.VISIBLE) {
+            progressBarComment.setVisibility(View.GONE);
+            rvComment.setVisibility(View.VISIBLE);
+        } else {
+            progressBarComment.setVisibility(View.VISIBLE);
+            rvComment.setVisibility(View.GONE);
+        }
     }
 
     private void initViews(View view) {

@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
     private void checkLoginAndShowFragment() {
         if (SharedPreferencesUtilities.getInstance(this).isUserLogin()) {
             User user = SharedPreferencesUtilities.getInstance(this).loggedInUser();
+            Toast.makeText(this, "Welcome back, " + user.getName(), Toast.LENGTH_SHORT).show();
             showDisplayPostFragment(user);
         } else {
             showLoginFragment();
