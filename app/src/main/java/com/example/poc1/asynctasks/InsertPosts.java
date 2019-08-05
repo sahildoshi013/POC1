@@ -3,7 +3,6 @@ package com.example.poc1.asynctasks;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.poc1.database.DatabaseProvider;
 import com.example.poc1.models.Post;
@@ -20,8 +19,9 @@ public class InsertPosts extends AsyncTask<List<Post>, Integer, Boolean> {
         weakReference = new WeakReference<>(context);
     }
 
+    @SafeVarargs
     @Override
-    protected Boolean doInBackground(List<Post>... lists) {
+    protected final Boolean doInBackground(List<Post>... lists) {
         Context context = weakReference.get();
         long[] result = null;
         if (context != null) {
@@ -37,12 +37,6 @@ public class InsertPosts extends AsyncTask<List<Post>, Integer, Boolean> {
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
         Log.d(TAG, "onPostExecute() called with: result = [" + result + "]");
-        Context context = weakReference.get();
-        if (result && context != null) {
-            Toast.makeText(context, "Post Saved", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "Fail to save post", Toast.LENGTH_SHORT).show();
-        }
     }
 }
 

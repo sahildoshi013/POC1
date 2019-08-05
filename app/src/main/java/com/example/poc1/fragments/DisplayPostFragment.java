@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -44,6 +45,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private Call<List<Post>> networkCall;
     private ProgressBar progressBarPost;
     private Integer userID;
+    private TextView tvNoPosts;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -95,7 +97,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         setRetainInstance(true);
@@ -110,6 +112,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
         recyclerView = view.findViewById(R.id.rvPost);
         progressBarPost = view.findViewById(R.id.progressBarPost);
+        tvNoPosts = view.findViewById(R.id.tvNoPosts);
 
         layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
 
@@ -151,7 +154,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
         networkCall = WebAPI.getClient().getPostOfUser(userID);
         networkCall.enqueue(new Callback<List<Post>>() {
             @Override
-            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+            public void onResponse(@NonNull Call<List<Post>> call, @NonNull Response<List<Post>> response) {
                 List<Post> result = null;
                 if (response.isSuccessful()){
                     result = response.body();
@@ -161,11 +164,8 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
             }
 
             @Override
-            public void onFailure(Call<List<Post>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Post>> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                if (postDisplayCallbacks != null) {
-                    postDisplayCallbacks.onDisplayPostFail();
-                }
                 displayPost(null);
                 displayProgressBar(false);
             }
@@ -184,6 +184,9 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
                 @Override
                 public void onPostLoadFail() {
                     Log.d(TAG, "onPostLoadFail() called");
+                    if (postDisplayCallbacks != null) {
+                        postDisplayCallbacks.onDisplayPostFail();
+                    }
                 }
             });
             getPosts.execute(userID);
@@ -207,9 +210,11 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
         if (isVisible) {
             progressBarPost.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
+            tvNoPosts.setVisibility(View.GONE);
         } else {
             progressBarPost.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+            tvNoPosts.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -32,7 +32,10 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getSupportActionBar().hide();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -100,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
     @Override
     public void onItemClick(Post post, int position) {
         Log.d(TAG, "onItemClick() called with: post = [" + post + "], position = [" + position + "]");
-        Toast.makeText(this, post.getTitle(), Toast.LENGTH_SHORT).show();
         PostDetailsFragment postDetailsFragment = new PostDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putString("postTitle", post.getTitle());

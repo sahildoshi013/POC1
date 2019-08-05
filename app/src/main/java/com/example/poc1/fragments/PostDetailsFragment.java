@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +44,7 @@ public class PostDetailsFragment extends Fragment {
     private MyCommentAdapter myCommentAdapter;
     private Call<List<Comment>> networkCall;
     private ProgressBar progressBarComment;
+    private TextView tvNoComment;
 
     public PostDetailsFragment() {
         // Required empty public constructor
@@ -50,7 +52,7 @@ public class PostDetailsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_post_details, container, false);
@@ -66,6 +68,7 @@ public class PostDetailsFragment extends Fragment {
 
         rvComment = view.findViewById(R.id.rvPostComments);
         progressBarComment = view.findViewById(R.id.progressBarComment);
+        tvNoComment = view.findViewById(R.id.tvNoComments);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvComment.setLayoutManager(linearLayoutManager);
@@ -85,7 +88,7 @@ public class PostDetailsFragment extends Fragment {
         networkCall = WebAPI.getClient().getCommentsOfPost(postID);
         networkCall.enqueue(new Callback<List<Comment>>() {
             @Override
-            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+            public void onResponse(@NonNull Call<List<Comment>> call, @NonNull Response<List<Comment>> response) {
                 List<Comment> result = null;
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
@@ -97,7 +100,7 @@ public class PostDetailsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Comment>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Comment>> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
                 displayComments(null);
                 displayProgressBar(false);
@@ -133,9 +136,11 @@ public class PostDetailsFragment extends Fragment {
         if (isVisible) {
             progressBarComment.setVisibility(View.VISIBLE);
             rvComment.setVisibility(View.GONE);
+            tvNoComment.setVisibility(View.GONE);
         } else {
             progressBarComment.setVisibility(View.GONE);
             rvComment.setVisibility(View.VISIBLE);
+            tvNoComment.setVisibility(View.VISIBLE);
         }
     }
 
