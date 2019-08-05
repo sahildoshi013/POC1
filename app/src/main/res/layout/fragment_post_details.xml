@@ -30,14 +30,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPostComments"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:layout_height="wrap_content">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <ProgressBar
         android:id="@+id/progressBarComment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible" />
+        android:layout_height="wrap_content" />
 </LinearLayout>

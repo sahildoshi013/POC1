@@ -19,8 +19,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.poc1.R;
 import com.example.poc1.adapter.MyPostAdapter;
 import com.example.poc1.api.WebAPI;
+import com.example.poc1.asynctasks.GetPosts;
+import com.example.poc1.asynctasks.InsertPosts;
 import com.example.poc1.models.Post;
-import com.example.poc1.models.User;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private StaggeredGridLayoutManager staggerGridLayoutManager;
     private Call<List<Post>> networkCall;
     private ProgressBar progressBarPost;
+    private Integer userID;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -68,7 +70,6 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private LinearLayoutManager layoutManager;
     private MyPostAdapter myPostAdapter;
     private List<Post> posts;
-    private User user;
 
     public DisplayPostFragment() {
         // Required empty public constructor
@@ -99,10 +100,10 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
         setRetainInstance(true);
 
-        if(getArguments()==null){
-            throw new IllegalStateException("Invalid invocation put user in arguments");
+        if (getArguments() != null) {
+            userID = getArguments().getInt("userID", 1);
         }
-        user = getArguments().getParcelable("user");
+
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_post, container, false);
@@ -142,10 +143,11 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     @Override
     public void onStart() {
         super.onStart();
-        getLatestPosts(1);
+        getLatestPosts(userID);
     }
 
-    private void getLatestPosts(Integer userID) {
+    private void getLatestPosts(final Integer userID) {
+        displayProgressBar(true);
         networkCall = WebAPI.getClient().getPostOfUser(userID);
         networkCall.enqueue(new Callback<List<Post>>() {
             @Override
@@ -154,18 +156,8 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
                 if (response.isSuccessful()){
                     result = response.body();
                 }
-                if (result != null) {
-                    posts.addAll(result);
-                    myPostAdapter.notifyDataSetChanged();
-                }
-                if (postDisplayCallbacks != null) {
-                    if (result != null) {
-                        postDisplayCallbacks.onDisplayPost(posts);
-                    } else {
-                        postDisplayCallbacks.onDisplayPostFail();
-                    }
-                }
-                toggleProgressBar();
+                displayPost(result);
+                displayProgressBar(false);
             }
 
             @Override
@@ -174,13 +166,45 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
                 if (postDisplayCallbacks != null) {
                     postDisplayCallbacks.onDisplayPostFail();
                 }
-                toggleProgressBar();
+                displayPost(null);
+                displayProgressBar(false);
             }
         });
     }
 
-    private void toggleProgressBar() {
-        if (progressBarPost.getVisibility() == View.GONE) {
+    private void displayPost(final List<Post> result) {
+        if (result == null) {
+            GetPosts getPosts = new GetPosts(getContext());
+            getPosts.setPostLoadCallback(new GetPosts.LoadPostCallback() {
+                @Override
+                public void onPostLoadSuccessful(List<Post> posts) {
+                    displayPost(posts);
+                }
+
+                @Override
+                public void onPostLoadFail() {
+                    Log.d(TAG, "onPostLoadFail() called");
+                }
+            });
+            getPosts.execute(userID);
+        } else {
+            InsertPosts insertPosts = new InsertPosts(getContext());
+            insertPosts.execute(result);
+            posts.addAll(result);
+            myPostAdapter.notifyDataSetChanged();
+            if (postDisplayCallbacks != null) {
+                if (result.size() > 0) {
+                    Log.d(TAG, "displayPost() called with: result = [" + result.size() + "]");
+                    postDisplayCallbacks.onDisplayPost(posts);
+                } else {
+                    postDisplayCallbacks.onDisplayPostFail();
+                }
+            }
+        }
+    }
+
+    private void displayProgressBar(boolean isVisible) {
+        if (isVisible) {
             progressBarPost.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {

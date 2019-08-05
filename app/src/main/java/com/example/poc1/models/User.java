@@ -1,13 +1,10 @@
 package com.example.poc1.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class User implements Parcelable {
+public class User {
 
     @SerializedName("id")
     @Expose
@@ -98,13 +95,4 @@ public class User implements Parcelable {
         this.company = company;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-
-    }
 }

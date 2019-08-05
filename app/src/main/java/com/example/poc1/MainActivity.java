@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
 
         DisplayPostFragment displayPostFragment = new DisplayPostFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("user", user);
+        bundle.putInt("userID", user.getId());
         displayPostFragment.setArguments(bundle);
         displayPostFragment.setOnItemClickListener(this);
 

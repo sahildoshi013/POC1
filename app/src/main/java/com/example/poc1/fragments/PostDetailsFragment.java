@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.poc1.R;
 import com.example.poc1.adapter.MyCommentAdapter;
 import com.example.poc1.api.WebAPI;
+import com.example.poc1.asynctasks.GetComments;
+import com.example.poc1.asynctasks.InsertComments;
 import com.example.poc1.models.Comment;
 
 import java.util.LinkedList;
@@ -79,34 +81,61 @@ public class PostDetailsFragment extends Fragment {
     }
 
     private void getPostComments() {
+        displayProgressBar(true);
         networkCall = WebAPI.getClient().getCommentsOfPost(postID);
         networkCall.enqueue(new Callback<List<Comment>>() {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                List<Comment> result = null;
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        comments.addAll(response.body());
-                        myCommentAdapter.notifyDataSetChanged();
+                        result = response.body();
                     }
                 }
-                toggleProgressBar();
+                displayComments(result);
+                displayProgressBar(false);
             }
 
             @Override
             public void onFailure(Call<List<Comment>> call, Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
-                toggleProgressBar();
+                displayComments(null);
+                displayProgressBar(false);
             }
         });
     }
 
-    private void toggleProgressBar() {
-        if (progressBarComment.getVisibility() == View.VISIBLE) {
-            progressBarComment.setVisibility(View.GONE);
-            rvComment.setVisibility(View.VISIBLE);
+    private void displayComments(List<Comment> result) {
+        if (result == null) {
+            GetComments getComments = new GetComments(getContext());
+            getComments.setCommentLoadCallback(new GetComments.LoadCommentCallback() {
+                @Override
+                public void onPostLoadSuccessful(List<Comment> comments) {
+                    Log.d(TAG, "onPostLoadSuccessful() called with: comments = [" + comments + "]");
+                    displayComments(comments);
+                }
+
+                @Override
+                public void onPostLoadFail() {
+                    Log.d(TAG, "onPostLoadFail() called");
+                }
+            });
+            getComments.execute(postID);
         } else {
+            InsertComments insertComments = new InsertComments(getContext());
+            insertComments.execute(result);
+            comments.addAll(result);
+            myCommentAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void displayProgressBar(boolean isVisible) {
+        if (isVisible) {
             progressBarComment.setVisibility(View.VISIBLE);
             rvComment.setVisibility(View.GONE);
+        } else {
+            progressBarComment.setVisibility(View.GONE);
+            rvComment.setVisibility(View.VISIBLE);
         }
     }
 

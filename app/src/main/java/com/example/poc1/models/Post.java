@@ -1,22 +1,30 @@
 package com.example.poc1.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Post implements Parcelable {
+@Entity
+public class Post {
 
     @SerializedName("userId")
     @Expose
     private Integer userId;
+
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
+
+    @ColumnInfo(name = "post_title")
     @SerializedName("title")
     @Expose
     private String title;
+
+    @ColumnInfo(name = "post_body")
     @SerializedName("body")
     @Expose
     private String body;
@@ -51,15 +59,5 @@ public class Post implements Parcelable {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-
     }
 }
