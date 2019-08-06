@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +83,9 @@ public class PostDetailsFragment extends Fragment {
 
         myCommentAdapter = new MyCommentAdapter(comments);
         rvComment.setAdapter(myCommentAdapter);
+
+        DividerItemDecoration decoration = new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL);
+        rvComment.addItemDecoration(decoration);
 
         getPostComments();
 

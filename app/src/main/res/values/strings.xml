@@ -18,4 +18,5 @@
     <string name="logout">Logout</string>
     <string name="no_more_comments">No More Comments</string>
     <string name="no_more_post">No More Post</string>
+    <string name="comments">Comments</string>
 </resources>
