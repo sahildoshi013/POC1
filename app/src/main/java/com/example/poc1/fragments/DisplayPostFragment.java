@@ -11,6 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,6 +48,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private ProgressBar progressBarPost;
     private Integer userID;
     private TextView tvNoPosts;
+    private String userName;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -100,11 +103,12 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        setRetainInstance(true);
-
         if (getArguments() != null) {
             userID = getArguments().getInt("userID", 1);
+            userName = getArguments().getString("userName", "");
         }
+
+        setActionBar();
 
 
         // Inflate the layout for this fragment
@@ -134,6 +138,17 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
         }
         return view;
+    }
+
+    private void setActionBar() {
+        AppCompatActivity activity = ((AppCompatActivity) getActivity());
+        if (activity != null) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.show();
+                actionBar.setTitle(userName);
+            }
+        }
     }
 
     @Override

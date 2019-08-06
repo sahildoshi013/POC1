@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.poc1.R;
@@ -57,13 +59,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         netwoekCall = WebAPI.getClient().getUsers();
         netwoekCall.enqueue(new Callback<List<User>>() {
             @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+            public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
                 User loginUser = null;
                 if (response.isSuccessful()) {
                     List<User> users = response.body();
-                    for (User user : users) {
-                        if (user.getEmail().toLowerCase().equals(emailID.toLowerCase())) {
-                            loginUser = user;
+                    if (users != null) {
+                        for (User user : users) {
+                            if (user.getEmail().toLowerCase().equals(emailID.toLowerCase())) {
+                                loginUser = user;
+                            }
                         }
                     }
                 }
@@ -79,7 +83,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<User>> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure() called with: call = [" + call + "], t = [" + t + "]");
                 if (loginCallback != null) {
                     loginCallback.onLoginFail(emailID);
@@ -130,6 +134,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        AppCompatActivity activity = ((AppCompatActivity) getActivity());
+        if (activity != null) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.hide();
+            }
+        }
+
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         textView = view.findViewById(R.id.tvEmailID);

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.poc1.fragments.DisplayPostFragment;
 import com.example.poc1.fragments.LoginFragment;
@@ -22,26 +23,23 @@ import com.example.poc1.utilities.SharedPreferencesUtilities;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoginFragment.LoginCallback, DisplayPostFragment.PostDisplayCallbacks, DisplayPostFragment.OnPostItemClickCallback {
+public class MainActivity extends AppCompatActivity implements LoginFragment.LoginCallback, DisplayPostFragment.PostDisplayCallbacks, DisplayPostFragment.OnPostItemClickCallback, FragmentManager.OnBackStackChangedListener {
 
     private static final String TAG = "MainActivity";
     private FrameLayout frmContainer;
     private Fragment loginDialogFragment;
+    private DisplayPostFragment displayPostFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
 
         setContentView(R.layout.activity_main);
 
 
         frmContainer = findViewById(R.id.frmContainer);
 
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
         checkLoginAndShowFragment();
     }
 
@@ -68,15 +66,10 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
     }
 
     private void showDisplayPostFragment(User user) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-            actionBar.setTitle(user.getName());
-        }
-
-        DisplayPostFragment displayPostFragment = new DisplayPostFragment();
+        displayPostFragment = new DisplayPostFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("userID", user.getId());
+        bundle.putString("userName", user.getName());
         displayPostFragment.setArguments(bundle);
         displayPostFragment.setOnItemClickListener(this);
 
@@ -109,24 +102,38 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         bundle.putString("postBody", post.getBody());
         bundle.putInt("postID", post.getId());
         postDetailsFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().replace(R.id.frmContainer, postDetailsFragment, "DisplayPost").addToBackStack("DisplayPost").commit();
+        FragmentFactory.loadFragment(this, R.id.frmContainer, postDetailsFragment, true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menus, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected() called with: item = [" + item + "]");
         if (item.getItemId() == R.id.btnLogout) {
             SharedPreferencesUtilities.getInstance(this).logoutUser();
             int count = getSupportFragmentManager().getBackStackEntryCount();
             Log.d(TAG, "onOptionsItemSelected: " + count);
             getSupportFragmentManager().popBackStack();
             showLoginFragment();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE);
+            } else {
+                actionBar.setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
+            }
+        }
     }
 }
