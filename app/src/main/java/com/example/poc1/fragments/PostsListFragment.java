@@ -36,9 +36,9 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPostItemClick {
+public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPostItemClick {
 
-    private static final String TAG = "DisplayPostFragment";
+    private static final String TAG = "PostsListFragment";
     private PostDisplayCallbacks postDisplayCallbacks;
     private OnPostItemClickCallback itemClickListenerCallback;
     private int scrollState;
@@ -76,7 +76,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
     private MyPostAdapter myPostAdapter;
     private List<Post> posts;
 
-    public DisplayPostFragment() {
+    public PostsListFragment() {
         // Required empty public constructor
     }
 
@@ -112,7 +112,7 @@ public class DisplayPostFragment extends Fragment implements MyPostAdapter.IMyPo
 
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_post, container, false);
+        View view = inflater.inflate(R.layout.fragment_post_list, container, false);
 
         recyclerView = view.findViewById(R.id.rvPost);
         progressBarPost = view.findViewById(R.id.progressBarPost);

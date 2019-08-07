@@ -11,8 +11,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.poc1.fragments.DisplayPostFragment;
 import com.example.poc1.fragments.LoginFragment;
+import com.example.poc1.fragments.PostsListFragment;
 import com.example.poc1.models.Post;
 import com.example.poc1.models.User;
 import com.example.poc1.utilities.FragmentFactory;
@@ -20,7 +20,7 @@ import com.example.poc1.utilities.SharedPreferencesUtilities;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoginFragment.LoginCallback, DisplayPostFragment.PostDisplayCallbacks, DisplayPostFragment.OnPostItemClickCallback, FragmentManager.OnBackStackChangedListener {
+public class MainActivity extends AppCompatActivity implements LoginFragment.LoginCallback, PostsListFragment.PostDisplayCallbacks, PostsListFragment.OnPostItemClickCallback, FragmentManager.OnBackStackChangedListener {
 
     private static final String TAG = "MainActivity";
     private Bundle postDetail;
@@ -80,8 +80,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         Bundle bundle = new Bundle();
         bundle.putInt("userID", user.getId());
         bundle.putString("userName", user.getName());
-        DisplayPostFragment displayPostFragment = (DisplayPostFragment) FragmentFactory.loadFragment(this, R.id.frmContainer, FragmentFactory.Screens.DISPLAY_POST, false, bundle);
-        displayPostFragment.setOnItemClickListener(this);
+        PostsListFragment postsListFragment = (PostsListFragment) FragmentFactory.loadFragment(this, R.id.frmContainer, FragmentFactory.Screens.DISPLAY_POST, false, bundle);
+        postsListFragment.setOnItemClickListener(this);
     }
 
     @Override

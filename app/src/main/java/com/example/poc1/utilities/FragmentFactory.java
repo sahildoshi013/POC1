@@ -7,9 +7,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.poc1.fragments.DisplayPostFragment;
 import com.example.poc1.fragments.LoginFragment;
-import com.example.poc1.fragments.PostDetailsFragment;
+import com.example.poc1.fragments.PostDetailFragment;
+import com.example.poc1.fragments.PostsListFragment;
 
 public class FragmentFactory {
 
@@ -47,13 +47,13 @@ public class FragmentFactory {
                 return loginFragment;
             case DISPLAY_POST:
                 if (postListFragment == null) {
-                    postListFragment = new DisplayPostFragment();
+                    postListFragment = new PostsListFragment();
                 }
                 postListFragment.setArguments(bundle);
                 return postListFragment;
             case POST_DETAIL:
                 if (postDetailFragment == null) {
-                    postDetailFragment = new PostDetailsFragment();
+                    postDetailFragment = new PostDetailFragment();
                 }
                 postDetailFragment.setArguments(bundle);
                 return postDetailFragment;

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostViewHolder> {
 
-    IMyPostItemClick listener;
+    private IMyPostItemClick listener;
 
     public interface IMyPostItemClick {
         void onItemClick(View view, int adapterPosition);
@@ -32,7 +32,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
     @NonNull
     @Override
     public MyPostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_layout, parent , false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout_post, parent, false);
         return new MyPostViewHolder(view);
     }
 
@@ -56,7 +56,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
         TextView tvTitle;
         TextView tvBody;
 
-        public MyPostViewHolder(@NonNull View itemView) {
+        MyPostViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvPostTitle);
             tvBody = itemView.findViewById(R.id.tvPostBody);

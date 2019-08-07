@@ -34,9 +34,9 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PostDetailsFragment extends Fragment {
+public class PostDetailFragment extends Fragment {
 
-    private static final String TAG = "PostDetailsFragment";
+    private static final String TAG = "PostDetailFragment";
     private String title;
     private String body;
     private int postID;
@@ -49,7 +49,7 @@ public class PostDetailsFragment extends Fragment {
     private ProgressBar progressBarComment;
     private TextView tvNoComment;
 
-    public PostDetailsFragment() {
+    public PostDetailFragment() {
         // Required empty public constructor
     }
 
@@ -61,7 +61,7 @@ public class PostDetailsFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_post_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_post_detail, container, false);
         initViews(view);
         if (getArguments() != null) {
             title = getArguments().getString("postTitle", "Fail");

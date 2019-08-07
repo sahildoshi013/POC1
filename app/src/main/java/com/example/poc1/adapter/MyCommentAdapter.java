@@ -24,7 +24,7 @@ public class MyCommentAdapter extends RecyclerView.Adapter<MyCommentAdapter.MyVi
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout_comment, parent, false);
         return new MyViewHolder(view);
     }
 
@@ -41,13 +41,13 @@ public class MyCommentAdapter extends RecyclerView.Adapter<MyCommentAdapter.MyVi
         return comments.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvUserEmailID;
         private TextView tvUserName;
         private TextView tvCommentBody;
 
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvUserEmailID = itemView.findViewById(R.id.tvUserEmailID);
