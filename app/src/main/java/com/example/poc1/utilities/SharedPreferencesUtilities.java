@@ -12,8 +12,8 @@ public class SharedPreferencesUtilities {
     private static SharedPreferencesUtilities sharedPreferencesUtilities;
     private static SharedPreferences sharedPreferences;
 
-    private static String userField = "User";
-    private static String isLoginField = "isLogin";
+    private static final String userField = "User";
+    private static final String isLoginField = "isLogin";
 
     private SharedPreferencesUtilities() {
 

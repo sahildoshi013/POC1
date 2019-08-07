@@ -14,9 +14,9 @@ public class Address {
     @SerializedName("city")
     @Expose
     private String city;
-    @SerializedName("zipcode")
+    @SerializedName("zipCode")
     @Expose
-    private String zipcode;
+    private String zipCode;
     @SerializedName("geo")
     @Expose
     private Geo geo;
@@ -45,12 +45,12 @@ public class Address {
         this.city = city;
     }
 
-    public String getZipcode() {
-        return zipcode;
+    public String getZipCode() {
+        return zipCode;
     }
 
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode;
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
     }
 
     public Geo getGeo() {

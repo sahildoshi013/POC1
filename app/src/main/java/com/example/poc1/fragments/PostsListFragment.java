@@ -41,14 +41,14 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
     private static final String TAG = "PostsListFragment";
     private PostDisplayCallbacks postDisplayCallbacks;
     private OnPostItemClickCallback itemClickListenerCallback;
-    private int scrollState;
-    private GridLayoutManager gridLayoutManager;
-    private StaggeredGridLayoutManager staggerGridLayoutManager;
     private Call<List<Post>> networkCall;
     private ProgressBar progressBarPost;
     private Integer userID;
     private TextView tvNoPosts;
     private String userName;
+    private RecyclerView recyclerView;
+    private MyPostAdapter myPostAdapter;
+    private List<Post> posts;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -71,10 +71,6 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
         this.itemClickListenerCallback=callback;
     }
 
-    private RecyclerView recyclerView;
-    private LinearLayoutManager layoutManager;
-    private MyPostAdapter myPostAdapter;
-    private List<Post> posts;
 
     public PostsListFragment() {
         // Required empty public constructor
@@ -118,23 +114,23 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
         progressBarPost = view.findViewById(R.id.progressBarPost);
         tvNoPosts = view.findViewById(R.id.tvNoPosts);
 
-        layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
 
-        gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
 
-        staggerGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager staggerGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 
         recyclerView.setLayoutManager(staggerGridLayoutManager);
 
         posts = new LinkedList<>();
 
         myPostAdapter = new MyPostAdapter(posts);
-        myPostAdapter.setItemOnClickListner(this);
+        myPostAdapter.setItemOnClickListener(this);
 
         recyclerView.setAdapter(myPostAdapter);
 
         if (savedInstanceState != null) {
-            scrollState = savedInstanceState.getInt(getString(R.string.scroll_state), 0);
+            int scrollState = savedInstanceState.getInt(getString(R.string.scroll_state), 0);
 
         }
         return view;

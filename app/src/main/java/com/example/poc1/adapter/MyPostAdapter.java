@@ -43,7 +43,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
         holder.tvBody.setText(post.getBody());
     }
 
-    public void setItemOnClickListner(IMyPostItemClick listener){
+    public void setItemOnClickListener(IMyPostItemClick listener) {
         this.listener = listener;
     }
 
@@ -53,8 +53,8 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
     }
 
     public class MyPostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle;
-        TextView tvBody;
+        final TextView tvTitle;
+        final TextView tvBody;
 
         MyPostViewHolder(@NonNull View itemView) {
             super(itemView);

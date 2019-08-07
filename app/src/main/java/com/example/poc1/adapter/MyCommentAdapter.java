@@ -43,9 +43,9 @@ public class MyCommentAdapter extends RecyclerView.Adapter<MyCommentAdapter.MyVi
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvUserEmailID;
-        private TextView tvUserName;
-        private TextView tvCommentBody;
+        private final TextView tvUserEmailID;
+        private final TextView tvUserName;
+        private final TextView tvCommentBody;
 
         MyViewHolder(@NonNull View itemView) {
             super(itemView);

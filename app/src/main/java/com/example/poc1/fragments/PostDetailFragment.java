@@ -37,8 +37,6 @@ import retrofit2.Response;
 public class PostDetailFragment extends Fragment {
 
     private static final String TAG = "PostDetailFragment";
-    private String title;
-    private String body;
     private int postID;
     private TextView tvBody;
     private TextView tvTitle;
@@ -64,8 +62,8 @@ public class PostDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_post_detail, container, false);
         initViews(view);
         if (getArguments() != null) {
-            title = getArguments().getString("postTitle", "Fail");
-            body = getArguments().getString("postBody", "Fail");
+            String title = getArguments().getString("postTitle", "Fail");
+            String body = getArguments().getString("postBody", "Fail");
             postID = getArguments().getInt("postID", 1);
 
             tvTitle.setText(title);

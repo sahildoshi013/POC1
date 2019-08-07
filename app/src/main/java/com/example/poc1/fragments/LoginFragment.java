@@ -35,7 +35,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "LoginFragment";
     private Button btnLogin;
     private ProgressBar progress_horizontal;
-    private Call<List<User>> netwoekCall;
+    private Call<List<User>> networkCall;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -56,8 +56,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void performLogin(final String emailID) {
-        netwoekCall = WebAPI.getClient().getUsers();
-        netwoekCall.enqueue(new Callback<List<User>>() {
+        networkCall = WebAPI.getClient().getUsers();
+        networkCall.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
                 User loginUser = null;
@@ -113,8 +113,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onDetach() {
         super.onDetach();
         Log.d(TAG, "onDetach() called");
-        if (netwoekCall != null) {
-            netwoekCall.cancel();
+        if (networkCall != null) {
+            networkCall.cancel();
         }
         loginCallback = null;
     }
