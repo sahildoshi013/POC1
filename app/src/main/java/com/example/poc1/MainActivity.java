@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,12 +25,19 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
 
     private static final String TAG = "MainActivity";
     private Bundle postDetail;
+    private boolean mIsDualPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+
+        View articleView = findViewById(R.id.frmContainerDetailPost);
+
+        mIsDualPane = articleView != null &&
+                articleView.getVisibility() == View.VISIBLE;
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
@@ -80,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         Bundle bundle = new Bundle();
         bundle.putInt("userID", user.getId());
         bundle.putString("userName", user.getName());
+        bundle.putBoolean("mIsDualPane", mIsDualPane);
         PostsListFragment postsListFragment = (PostsListFragment) FragmentFactory.loadFragment(this, R.id.frmContainer, FragmentFactory.Screens.DISPLAY_POST, false, bundle);
         postsListFragment.setOnItemClickListener(this);
     }
@@ -112,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Log
         bundle.putString("postTitle", post.getTitle());
         bundle.putString("postBody", post.getBody());
         bundle.putInt("postID", post.getId());
-        FragmentFactory.loadFragment(this, R.id.frmContainer, FragmentFactory.Screens.POST_DETAIL, true, bundle);
+        int container = (mIsDualPane) ? R.id.frmContainerDetailPost : R.id.frmContainer;
+        FragmentFactory.loadFragment(this, container, FragmentFactory.Screens.POST_DETAIL, !mIsDualPane, bundle);
         postDetail = bundle;
     }
 

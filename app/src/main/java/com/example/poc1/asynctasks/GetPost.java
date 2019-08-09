@@ -11,13 +11,13 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetPosts extends AsyncTask<Integer, Integer, List<Post>> {
+public class GetPost extends AsyncTask<Integer, Integer, List<Post>> {
 
-    private static final String TAG = "GetPosts";
+    private static final String TAG = "GetPostsByUserID";
     private final WeakReference<Context> weakReference;
     private LoadPostCallback callback;
 
-    public GetPosts(Context context) {
+    public GetPost(Context context) {
         weakReference = new WeakReference<>(context);
     }
 
@@ -33,8 +33,8 @@ public class GetPosts extends AsyncTask<Integer, Integer, List<Post>> {
 
         if (context != null) {
             for (int i = 0; i < integers.length; i++) {
-                List<Post> loadedPost = DatabaseProvider.getDatabaseInstance(context).postDao().loadAllByUserId(integers[i]);
-                posts.addAll(loadedPost);
+                Post loadedPost = DatabaseProvider.getDatabaseInstance(context).postDao().getPost(integers[i]);
+                posts.add(loadedPost);
                 publishProgress(integers.length / (i + 1));
             }
         }
@@ -63,7 +63,6 @@ public class GetPosts extends AsyncTask<Integer, Integer, List<Post>> {
 
     public interface LoadPostCallback {
         void onPostLoadSuccessful(List<Post> posts);
-
         void onPostLoadFail();
     }
 }

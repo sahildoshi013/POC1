@@ -7,22 +7,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.poc1.R;
 import com.example.poc1.adapter.MyPostAdapter;
 import com.example.poc1.api.WebAPI;
-import com.example.poc1.asynctasks.GetPosts;
+import com.example.poc1.asynctasks.GetPostsByUserID;
 import com.example.poc1.asynctasks.InsertPosts;
 import com.example.poc1.models.Post;
 
@@ -42,13 +41,16 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
     private PostDisplayCallbacks postDisplayCallbacks;
     private OnPostItemClickCallback itemClickListenerCallback;
     private Call<List<Post>> networkCall;
-    private ProgressBar progressBarPost;
     private Integer userID;
     private TextView tvNoPosts;
     private String userName;
     private RecyclerView recyclerView;
     private MyPostAdapter myPostAdapter;
     private List<Post> posts;
+    private static int scrollToPosition = 0;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private Boolean mIsDualPane;
+    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     public void onItemClick(View view, int position) {
@@ -102,6 +104,7 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
         if (getArguments() != null) {
             userID = getArguments().getInt("userID", 1);
             userName = getArguments().getString("userName", "");
+            mIsDualPane = getArguments().getBoolean("mIsDualPane", false);
         }
 
         setActionBar();
@@ -111,16 +114,25 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
         View view = inflater.inflate(R.layout.fragment_post_list, container, false);
 
         recyclerView = view.findViewById(R.id.rvPost);
-        progressBarPost = view.findViewById(R.id.progressBarPost);
         tvNoPosts = view.findViewById(R.id.tvNoPosts);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getLatestPosts(userID);
+            }
+        });
 
-        StaggeredGridLayoutManager staggerGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 
-        recyclerView.setLayoutManager(staggerGridLayoutManager);
+        if (mIsDualPane) {
+            layoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
+        } else {
+            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        }
+
+        recyclerView.setLayoutManager(layoutManager);
 
         posts = new LinkedList<>();
 
@@ -129,10 +141,8 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
 
         recyclerView.setAdapter(myPostAdapter);
 
-        if (savedInstanceState != null) {
-            int scrollState = savedInstanceState.getInt(getString(R.string.scroll_state), 0);
+        getLatestPosts(userID);
 
-        }
         return view;
     }
 
@@ -151,13 +161,19 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState() called with: outState = [" + outState + "]");
-        outState.putInt(getString(R.string.scroll_state), recyclerView.getScrollState());
+        if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] positions = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
+            if (positions.length > 0) {
+                scrollToPosition = positions[0];
+            }
+        } else if (layoutManager instanceof LinearLayoutManager) {
+            scrollToPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        getLatestPosts(userID);
     }
 
     private void getLatestPosts(final Integer userID) {
@@ -185,8 +201,8 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
 
     private void displayPost(final List<Post> result) {
         if (result == null) {
-            GetPosts getPosts = new GetPosts(getContext());
-            getPosts.setPostLoadCallback(new GetPosts.LoadPostCallback() {
+            GetPostsByUserID getPostsByUserID = new GetPostsByUserID(getContext());
+            getPostsByUserID.setPostLoadCallback(new GetPostsByUserID.LoadPostCallback() {
                 @Override
                 public void onPostLoadSuccessful(List<Post> posts) {
                     displayPost(posts);
@@ -200,12 +216,15 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
                     }
                 }
             });
-            getPosts.execute(userID);
+            getPostsByUserID.execute(userID);
         } else {
             InsertPosts insertPosts = new InsertPosts(getContext());
             insertPosts.execute(result);
             posts.addAll(result);
             myPostAdapter.notifyDataSetChanged();
+            if (scrollToPosition < posts.size()) {
+                layoutManager.scrollToPosition(scrollToPosition);
+            }
             if (postDisplayCallbacks != null) {
                 if (result.size() > 0) {
                     Log.d(TAG, "displayPost() called with: result = [" + result.size() + "]");
@@ -219,13 +238,13 @@ public class PostsListFragment extends Fragment implements MyPostAdapter.IMyPost
 
     private void displayProgressBar(boolean isVisible) {
         if (isVisible) {
-            progressBarPost.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             tvNoPosts.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(true);
         } else {
-            progressBarPost.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             tvNoPosts.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 }

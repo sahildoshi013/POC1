@@ -39,12 +39,6 @@ public class FragmentFactory {
 
     private static Fragment getFragmentFromState(Screens applicationState, Bundle bundle) {
         switch (applicationState) {
-            case LOGIN:
-                if (loginFragment == null) {
-                    loginFragment = new LoginFragment();
-                }
-                loginFragment.setArguments(bundle);
-                return loginFragment;
             case DISPLAY_POST:
                 if (postListFragment == null) {
                     postListFragment = new PostsListFragment();
@@ -52,9 +46,7 @@ public class FragmentFactory {
                 postListFragment.setArguments(bundle);
                 return postListFragment;
             case POST_DETAIL:
-                if (postDetailFragment == null) {
-                    postDetailFragment = new PostDetailFragment();
-                }
+                postDetailFragment = new PostDetailFragment();
                 postDetailFragment.setArguments(bundle);
                 return postDetailFragment;
             default:

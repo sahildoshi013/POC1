@@ -1,5 +1,6 @@
 package com.example.poc1.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostViewHolder> {
 
-    private IMyPostItemClick listener;
+    private static IMyPostItemClick listener;
 
     public interface IMyPostItemClick {
         void onItemClick(View view, int adapterPosition);
@@ -32,6 +33,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
     @NonNull
     @Override
     public MyPostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder() called with: parent = [" + parent + "], viewType = [" + viewType + "]");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layout_post, parent, false);
         return new MyPostViewHolder(view);
     }
@@ -44,7 +46,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
     }
 
     public void setItemOnClickListener(IMyPostItemClick listener) {
-        this.listener = listener;
+        MyPostAdapter.listener = listener;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.MyPostView
         return posts.size();
     }
 
-    public class MyPostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class MyPostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final TextView tvTitle;
         final TextView tvBody;
 

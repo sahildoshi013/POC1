@@ -18,4 +18,7 @@ public interface PostDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insertAll(List<Post> posts);
 
+    @Query("select * from post where id in (:postId)")
+    Post getPost(int postId);
+
 }
